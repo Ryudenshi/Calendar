@@ -16,9 +16,14 @@ class Reminder extends Model
         'datetime',
         'repeat_type',
     ];
-    
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function settings()
+    {
+        return $this->hasMany(ReminderSetting::class);
     }
 }

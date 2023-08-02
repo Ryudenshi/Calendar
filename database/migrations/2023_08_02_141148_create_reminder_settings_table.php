@@ -11,6 +11,7 @@ class CreateReminderSettingsTable extends Migration
         Schema::create('reminder_settings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('reminder_id');
+            $table->enum('repeat_type', ['none', 'daily', 'weekly', 'monthly', 'yearly'])->default('none');
             $table->string('repeat_value')->nullable();
             $table->timestamps();
 

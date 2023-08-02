@@ -11,6 +11,7 @@ class ReminderSetting extends Model
 
     protected $fillable = [
         'reminder_id',
+        'repeat_type',
         'repeat_value',
     ];
 

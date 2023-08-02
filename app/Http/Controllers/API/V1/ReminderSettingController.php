@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ReminderSetting;
 use App\Http\Resources\ReminderSettingResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReminderSettingController extends Controller
 {
@@ -26,8 +27,13 @@ class ReminderSettingController extends Controller
     // Create a new reminder setting
     public function store(Request $request)
     {
-        $reminderSetting = ReminderSetting::create($request->all());
-        return new ReminderSettingResource($reminderSetting);
+        $user = Auth::user(); // Get the authenticated user
+        $reminderSettingData = $request->all();
+
+        // You might want to add additional validation or checks here
+
+        $reminderSetting = ReminderSetting::create($reminderSettingData);
+        return response()->json(['message' => 'Reminder setting created successfully', 'reminderSetting' => new ReminderSettingResource($reminderSetting)]);
     }
 
     // Update reminder setting details
