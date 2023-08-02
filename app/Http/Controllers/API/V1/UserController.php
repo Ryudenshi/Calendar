@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    // Get all users list
     public function index()
     {
         return User::all();
