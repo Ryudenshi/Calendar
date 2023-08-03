@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Reminder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class ReminderController extends Controller
 {
@@ -20,6 +21,8 @@ class ReminderController extends Controller
         $reminder = new Reminder($request->all());
         $reminder->user_id = Auth::user()->id;
         $reminder->save();
+
+        $reminder->datetime = Carbon::parse($reminder->datetime)->format('Y-m-d\TH:i:s');
 
         return response()->json($reminder, 201);
     }
@@ -39,7 +42,7 @@ class ReminderController extends Controller
 
         $reminder->update($request->all());
 
-        return response()->json($reminder, 200);
+        return response()->json(['reminder' => $reminder]);
     }
 
     public function destroy(Reminder $reminder)

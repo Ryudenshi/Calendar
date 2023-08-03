@@ -1,15 +1,32 @@
 <?php
 
-// app/Http/Controllers/EventController.php
-
 namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
+    public function index()
+    {
+        $events = Event::where('user_id', Auth::user()->id)->get();
+
+        $formattedEvents = [];
+        foreach ($events as $event) {
+            $formattedEvents[] = [
+                'id' => $event->id,
+                'title' => $event->title,
+                'start' => $event->start_datetime,
+                'end' => $event->end_datetime,
+                'color' => $event->color,
+            ];
+        }
+
+        return response()->json($formattedEvents);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -23,7 +40,10 @@ class EventController extends Controller
         $event->user_id = Auth::user()->id;
         $event->save();
 
-        return response()->json($event, 201);
+        $event->start_datetime = Carbon::parse($event->start_datetime)->format('Y-m-d\TH:i:s');
+        $event->end_datetime = Carbon::parse($event->end_datetime)->format('Y-m-d\TH:i:s');
+
+        return response()->json(['event' => $event]);
     }
 
     public function update(Request $request, Event $event)
