@@ -19,10 +19,14 @@
         </div>
         <div class="row d-flex justify-content-center" style="margin-top: 150px;">
             <div class="col-3">
-                <h1>LOGIN</h1>
+                <h1>
+                    <a class="nav-link" href="{{ route('login') }}">{{ __('LOGIN') }}</a>
+                </h1>
             </div>
             <div class="col-2">
-                <h1>REGISTER</h1>
+                <h1>
+                    <a class="nav-link" href="{{ route('register') }}">{{ __('REGISTER') }}</a>
+                </h1>
             </div>
         </div>
     </div>

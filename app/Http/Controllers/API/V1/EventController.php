@@ -16,6 +16,11 @@ class EventController extends Controller
         $this->middleware('auth:api')->except(['index', 'show']);
     }
 
+    public function create()
+    {
+        return view('events.create');
+    }
+
     // Get all events for a specific user
     public function index($userId)
     {
