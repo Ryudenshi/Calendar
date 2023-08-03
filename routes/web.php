@@ -21,3 +21,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::resource('home', 'HomeController');
+
+Route::resource('reminders', 'ReminderController');
+
+Route::resource('events', 'EventController');

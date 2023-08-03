@@ -21,9 +21,4 @@ class Reminder extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function settings()
-    {
-        return $this->hasMany(ReminderSetting::class);
-    }
 }

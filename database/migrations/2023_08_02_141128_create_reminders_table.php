@@ -14,10 +14,13 @@ class CreateRemindersTable extends Migration
             $table->string('title');
             $table->string('color');
             $table->dateTime('datetime');
-            $table->string('repeat_type')->nullable();
+            $table->enum('repeat_type', ['none', 'daily', 'weekly', 'monthly', 'yearly'])->default('none');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 
