@@ -9,6 +9,24 @@ use Carbon\Carbon;
 
 class ReminderController extends Controller
 {
+
+    public function index()
+    {
+        $reminders = Reminder::where('user_id', Auth::user()->id)->get();
+
+        $formattedReminders = [];
+        foreach ($reminders as $reminder) {
+            $formattedReminders[] = [
+                'id' => $reminder->id,
+                'title' => $reminder->title,
+                'start' => $reminder->datetime,
+                'color' => $reminder->color,
+            ];
+        }
+
+        return response()->json($formattedReminders);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

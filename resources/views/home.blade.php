@@ -2,6 +2,7 @@
 
 @php
 $eventsRoute = route('events.index');
+$remindersRoute = route('reminders.index');
 @endphp
 
 @section('content')
@@ -91,6 +92,7 @@ $eventsRoute = route('events.index');
 
 <script>
     var eventsRoute = '{{ $eventsRoute }}';
+    var remindersRoute = '{{ $remindersRoute }}';
 
     $(document).ready(function() {
         $('#calendar').fullCalendar({
@@ -116,7 +118,10 @@ $eventsRoute = route('events.index');
             events: eventsRoute,
             eventClick: function(event) {
 
-            }
+            },
+            eventSources: [{
+                url: remindersRoute,
+            }]
         });
 
         $('#eventForm').on('submit', function(e) {
