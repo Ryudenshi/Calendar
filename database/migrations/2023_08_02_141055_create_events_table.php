@@ -15,6 +15,7 @@ class CreateEventsTable extends Migration
             $table->string('color');
             $table->dateTime('start_datetime');
             $table->dateTime('end_datetime');
+            $table->boolean('completed')->default(false);
             $table->timestamps();
 
             $table->foreign('user_id')

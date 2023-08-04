@@ -6,6 +6,7 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
@@ -21,6 +22,7 @@ class EventController extends Controller
                 'start' => $event->start_datetime,
                 'end' => $event->end_datetime,
                 'color' => $event->color,
+                'completed' => $event->completed,
             ];
         }
 
@@ -57,8 +59,9 @@ class EventController extends Controller
             'color' => 'required|string|max:20',
             'start_datetime' => 'required|date',
             'end_datetime' => 'required|date|after_or_equal:start_datetime',
+            'completed' => 'required|boolean',
         ]);
-
+        
         $event->update($request->all());
 
         return response()->json($event, 200);
