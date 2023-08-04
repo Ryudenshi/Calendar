@@ -171,6 +171,28 @@ $remindersRoute = route('reminders.index');
     </div>
 </div>
 
+<div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteEventModalLabel">Delete Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="deleteEventForm" action="" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <div class="mb-3">
+                        <label for="delete=-event-id" class="form-label">Select Event to Update</label>
+                        <select class="form-select" id="delete-event-id" name="event_id"></select>
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger" id="confirmDeleteEventBtn">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     var eventsRoute = '{{ $eventsRoute }}';
@@ -182,6 +204,19 @@ $remindersRoute = route('reminders.index');
         dataType: 'json',
         success: function(response) {
             var dropdown = $('#update-event-id');
+            dropdown.empty();
+            $.each(response, function(index, event) {
+                dropdown.append($('<option></option>').attr('value', event.id).text(event.title));
+            });
+        }
+    });
+
+    $.ajax({
+        url: eventsRoute,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            var dropdown = $('#delete-event-id');
             dropdown.empty();
             $.each(response, function(index, event) {
                 dropdown.append($('<option></option>').attr('value', event.id).text(event.title));
@@ -221,23 +256,35 @@ $remindersRoute = route('reminders.index');
                 },
 
                 EventUpdateButton: {
-                    text: '+ update Event',
+                    text: 'update Event',
                     click: function() {
                         $('#updateEventForm').attr('action', eventsRoute + '/' + event.id);
-                        $('#update-event-title').val(event.title);
-                        $('#update-event-color').val(event.color);
-                        $('#update-event-start-datetime').val(event.start.format('YYYY-MM-DDTHH:mm'));
-                        $('#update-event-end-datetime').val(event.end.format('YYYY-MM-DDTHH:mm'));
-                        $('#update-event-completed-status').val(event.completed);
+
                         $('#updateEventModal').modal('show');
                     }
                 },
                 ReminderUpdateButton: {
-                    text: '+ update a Reminder',
+                    text: 'update Reminder',
                     click: function() {
                         $('#updateReminderForm').attr('action', remindersRoute + '/' + event.id);
 
                         $('#updateReminderModal').modal('show');
+                    }
+                },
+                EventDeleteButton: {
+                    text: '- delete Event',
+                    click: function() {
+                        $('#updateEventForm').attr('action', eventsRoute + '/' + event.id);
+
+                        $('#deleteEventModal').modal('show');
+                    }
+                },
+                ReminderDeleteButton: {
+                    text: '- delete Reminder',
+                    click: function() {
+                        $('#updateReminderForm').attr('action', remindersRoute + '/' + event.id);
+
+                        $('#deleteReminderModal').modal('show');
                     }
                 },
             },
@@ -257,7 +304,8 @@ $remindersRoute = route('reminders.index');
             },
 
             footer: {
-                left: 'EventUpdateButton, ReminderUpdateButton',
+                left: 'ReminderUpdateButton, EventUpdateButton',
+                right: 'ReminderDeleteButton, EventDeleteButton',
             },
 
             events: eventsRoute,
@@ -327,15 +375,28 @@ $remindersRoute = route('reminders.index');
 
         $('#updateEventForm').on('submit', function(e) {
             e.preventDefault();
+            var eventId = $('#update-event-id').val();
+            var title = $('#update-event-title').val();
+            var color = $('#update-event-color').val();
+            var startDatetime = $('#update-event-start-datetime').val();
+            var endDatetime = $('#update-event-end-datetime').val();
+            var completedStatus = $('#update-event-completed-status').val() === 'true';
+
             var formData = $(this).serialize();
             console.log('Form Data:', formData);
             $.ajax({
-                type: "POST",
-                url: 'events/' + $('#update-event-id').val(),
-                data: formData,
+                type: "PUT",
+                url: eventsRoute + '/' + eventId,
+                data: {
+                    title: title,
+                    color: color,
+                    datetime: startDatetime,
+                    datetime: endDatetime,
+                    completed: completedStatus,
+                    _token: '{{ csrf_token() }}',
+                },
                 success: function(response) {
                     $('#updateEventModal').modal('hide');
-                    $('#calendar').fullCalendar('refetchEvents');
                 },
                 error: function(xhr, textStatus, errorThrown) {
                     console.error(xhr.responseText);
@@ -345,7 +406,7 @@ $remindersRoute = route('reminders.index');
 
         $('#updateReminderForm').on('submit', function(e) {
             e.preventDefault();
-            var reminderId = $('#update-reminder-id').val(); // Get the reminder ID from the select input field
+            var reminderId = $('#update-reminder-id').val();
             var title = $('#update-reminder-title').val();
             var color = $('#update-reminder-color').val();
             var datetime = $('#update-reminder-datetime').val();
@@ -366,6 +427,27 @@ $remindersRoute = route('reminders.index');
                 },
                 success: function(response) {
                     $('#updateReminderModal').modal('hide');
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+
+        $('#deleteEventForm').on('submit', function(e) {
+            e.preventDefault();
+            var eventId = $('#delete-event-id').val();
+
+            var formData = $(this).serialize();
+            console.log('Form Data:', formData);
+            $.ajax({
+                type: "DELETE",
+                url: 'events/' + $('#delete-event-id').val(),
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#updateEventModal').modal('hide');
                 },
                 error: function(xhr, textStatus, errorThrown) {
                     console.error(xhr.responseText);
