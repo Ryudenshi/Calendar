@@ -119,7 +119,51 @@ $remindersRoute = route('reminders.index');
                         <label for="update-event-end-datetime" class="form-label">Event end data time</label>
                         <input type="datetime-local" class="form-control" id="update-event-end-datetime" name="end_datetime" required>
                     </div>
-                    <input type="hidden" name="completed" value="false" required>
+                    <input type="hidden" id="update-event-completed-status" name="completed" value="false" required>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="updateReminderModal" tabindex="-1" aria-labelledby="updateReminderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateReminderModalLabel">Update Reminder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateReminderForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="mb-3">
+                        <label for="reminder-event-id" class="form-label">Select Reminder to Update</label>
+                        <select class="form-select" id="update-reminder-id" name="reminder_id"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reminder-title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="update-reminder-title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reminder-color" class="form-label">Color</label>
+                        <input type="text" class="form-control" id="update-reminder-color" name="color" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reminder-datetime" class="form-label">Reminder data time</label>
+                        <input type="datetime-local" class="form-control" id="update-reminder-datetime" name="datetime" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reminder-repeat-type" class="form-label">Repeate type</label>
+                        <select class="form-select" id="update-reminder-repeat-type" name="repeat_type">
+                            <option value="none">no repeats</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-primary">Update</button>
                 </form>
             </div>
@@ -145,6 +189,19 @@ $remindersRoute = route('reminders.index');
         }
     });
 
+    $.ajax({
+        url: remindersRoute,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            var dropdown = $('#update-reminder-id');
+            dropdown.empty();
+            $.each(response, function(index, reminder) {
+                dropdown.append($('<option></option>').attr('value', reminder.id).text(reminder.title));
+            });
+        }
+    });
+
     $(document).ready(function() {
         $('#calendar').fullCalendar({
 
@@ -166,17 +223,19 @@ $remindersRoute = route('reminders.index');
                 EventUpdateButton: {
                     text: '+ update Event',
                     click: function() {
+                        $('#updateEventForm').attr('action', eventsRoute + '/' + event.id);
+                        $('#update-event-title').val(event.title);
+                        $('#update-event-color').val(event.color);
+                        $('#update-event-start-datetime').val(event.start.format('YYYY-MM-DDTHH:mm'));
+                        $('#update-event-end-datetime').val(event.end.format('YYYY-MM-DDTHH:mm'));
+                        $('#update-event-completed-status').val(event.completed);
                         $('#updateEventModal').modal('show');
                     }
                 },
                 ReminderUpdateButton: {
                     text: '+ update a Reminder',
                     click: function() {
-                        $('#updateEventForm').attr('action', eventsRoute + '/' + event.id);
-                        $('#update-event-title').val(event.title);
-                        $('#update-event-color').val(event.color);
-                        $('#update-event-start-datetime').val(event.start.format('YYYY-MM-DDTHH:mm'));
-                        $('#update-event-end-datetime').val(event.end.format('YYYY-MM-DDTHH:mm'));
+                        $('#updateReminderForm').attr('action', remindersRoute + '/' + event.id);
 
                         $('#updateReminderModal').modal('show');
                     }
@@ -277,6 +336,36 @@ $remindersRoute = route('reminders.index');
                 success: function(response) {
                     $('#updateEventModal').modal('hide');
                     $('#calendar').fullCalendar('refetchEvents');
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+
+        $('#updateReminderForm').on('submit', function(e) {
+            e.preventDefault();
+            var reminderId = $('#update-reminder-id').val(); // Get the reminder ID from the select input field
+            var title = $('#update-reminder-title').val();
+            var color = $('#update-reminder-color').val();
+            var datetime = $('#update-reminder-datetime').val();
+            var repeatType = $('#update-reminder-repeat-type').val();
+
+            $.ajax({
+                type: "PUT",
+                url: remindersRoute + '/' + reminderId,
+                data: {
+                    title: title,
+                    color: color,
+                    datetime: datetime,
+                    repeat_type: repeatType,
+                    _token: '{{ csrf_token() }}',
+                },
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#updateReminderModal').modal('hide');
                 },
                 error: function(xhr, textStatus, errorThrown) {
                     console.error(xhr.responseText);
