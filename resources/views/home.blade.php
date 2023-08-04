@@ -100,7 +100,7 @@ $remindersRoute = route('reminders.index');
                     @csrf
                     @method('PUT')
                     <div class="mb-3">
-                        <label for="update-event-id" class="form-label">Select Event to Update</label>
+                        <label for="update-event-id" class="form-label">Select Event to update</label>
                         <select class="form-select" id="update-event-id" name="event_id"></select>
                     </div>
                     <div class="mb-3">
@@ -183,11 +183,34 @@ $remindersRoute = route('reminders.index');
                     @csrf
                     @method('DELETE')
                     <div class="mb-3">
-                        <label for="delete=-event-id" class="form-label">Select Event to Update</label>
+                        <label for="delete-event-id" class="form-label">Select Event to delete</label>
                         <select class="form-select" id="delete-event-id" name="event_id"></select>
                     </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger" id="confirmDeleteEventBtn">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteReminderModal" tabindex="-1" aria-labelledby="deleteReminderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteReminderModalLabel">Delete Reminder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="deleteReminderForm" action="" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <div class="mb-3">
+                        <label for="delete-reminder-id" class="form-label">Select Reminder to delete</label>
+                        <select class="form-select" id="delete-reminder-id" name="reminder_id"></select>
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger" id="confirmDeleteReminderBtn">Delete</button>
                 </form>
             </div>
         </div>
@@ -230,6 +253,19 @@ $remindersRoute = route('reminders.index');
         dataType: 'json',
         success: function(response) {
             var dropdown = $('#update-reminder-id');
+            dropdown.empty();
+            $.each(response, function(index, reminder) {
+                dropdown.append($('<option></option>').attr('value', reminder.id).text(reminder.title));
+            });
+        }
+    });
+
+    $.ajax({
+        url: remindersRoute,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            var dropdown = $('#delete-reminder-id');
             dropdown.empty();
             $.each(response, function(index, reminder) {
                 dropdown.append($('<option></option>').attr('value', reminder.id).text(reminder.title));
@@ -443,6 +479,27 @@ $remindersRoute = route('reminders.index');
             $.ajax({
                 type: "DELETE",
                 url: 'events/' + $('#delete-event-id').val(),
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#updateEventModal').modal('hide');
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+
+        $('#deleteReminderForm').on('submit', function(e) {
+            e.preventDefault();
+            var reminderIdId = $('#delete-reminder-id').val();
+
+            var formData = $(this).serialize();
+            console.log('Form Data:', formData);
+            $.ajax({
+                type: "DELETE",
+                url: 'reminders/' + $('#delete-reminder-id').val(),
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
