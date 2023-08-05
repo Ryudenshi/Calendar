@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\EventReminderJob;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,8 @@ class EventController extends Controller
         $event->start_datetime = Carbon::parse($event->start_datetime)->format('Y-m-d\TH:i:s');
         $event->end_datetime = Carbon::parse($event->end_datetime)->format('Y-m-d\TH:i:s');
 
+        dispatch(new EventReminderJob(Auth::user(), $event));
+
         return response()->json(['event' => $event]);
     }
 
@@ -61,7 +64,7 @@ class EventController extends Controller
             'end_datetime' => 'required|date|after_or_equal:start_datetime',
             'completed' => 'required|boolean',
         ]);
-        
+
         $event->update($request->all());
 
         return response()->json($event, 200);
