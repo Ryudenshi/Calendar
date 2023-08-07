@@ -17,7 +17,7 @@ class Event extends Model
         'end_datetime',
         'completed',
     ];
-    
+
     public function user()
     {
         return $this->belongsTo(User::class);

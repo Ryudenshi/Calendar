@@ -12,7 +12,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
 
-class EventReminderMail extends Mailable
+class EventStartMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -21,8 +21,6 @@ class EventReminderMail extends Mailable
     public function __construct(Event $event)
     {
         $this->event = $event;
-
-        
     }
 
     /**
@@ -30,13 +28,10 @@ class EventReminderMail extends Mailable
      *
      * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
-    public function build(User $email)
+    public function build()
     {
-        $email->email = Auth::user()->email;
-
-        return $this->from('nigga@gmail.com')
-            ->to($email)
-            ->subject('Event Reminder')
-            ->view('emails.event_reminder', ['event' => $this->event]);
+        return $this->from('mimidzo9629@gmail.com', 'mimidzo')
+            ->subject('Event is starting soon')
+            ->view('emails.event_start', ['event' => $this->event]);
     }
 }
