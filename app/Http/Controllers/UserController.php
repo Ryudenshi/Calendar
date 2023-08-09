@@ -29,7 +29,7 @@ class UserController extends Controller
         ]);
 
         $user = User::findOrFail($request->input('user_id'));
-        $user->name = $request->input('name');
+        $user->name = $request->input('new_name');
         $user->save();
 
         return response()->json(['message' => 'Name updated successfully']);
