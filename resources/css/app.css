@@ -1,3 +1,7 @@
 .completed-event {
     text-decoration: line-through;
   }
+
+  .userButton{
+    width: 180px;
+  }

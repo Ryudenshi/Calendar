@@ -60,7 +60,7 @@ class ReminderController extends Controller
 
         $reminder->update($request->all());
 
-        return response()->json(['reminder' => $reminder]);
+        return response()->json($reminder, 200);
     }
 
     public function destroy(Reminder $reminder)

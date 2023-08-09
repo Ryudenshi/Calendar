@@ -23,7 +23,7 @@ class Kernel extends ConsoleKernel
                 ->where('start_datetime', '<=', $now->copy()->addDay())
                 ->get();
 
-            foreach ($events as $event) {   
+            foreach ($events as $event) {
                 Mail::to($event->user->email)->send(new EventStartMail($event));
             }
         })->dailyAt('09:00');
@@ -45,11 +45,15 @@ class Kernel extends ConsoleKernel
                 ->where('datetime', '<=', $now->copy()->addDay())
                 ->get();
 
-            foreach ($reminders as $reminder) {   
+            foreach ($reminders as $reminder) {
                 Mail::to($reminder->user->email)->send(new ReminderStartMail($reminder));
             }
         })->dailyAt('09:00');
+
+        $schedule->command('send:event-reminders')->dailyAt('09:00');
     }
+
+
 
     protected function commands(): void
     {

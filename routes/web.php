@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -25,3 +26,9 @@ Route::resource('home', 'HomeController');
 Route::resource('reminders', 'ReminderController');
 
 Route::resource('events', 'EventController');
+
+Route::resource('user', 'UserController');
+
+Route::put('/user/updateName', 'UserController@updateName')->name('user.updateName');
+Route::put('/user/updateEmail', 'UserController@updateEmail')->name('user.updateEmail');
+Route::put('/user/updatePassword', 'UserController@updatePassword')->name('user.updatePassword');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\EventStore;
 use App\Jobs\EventReminderJob;
+use App\Jobs\EventStartJob;
 use App\Jobs\TelegramNotificationJob;
 use App\Mail\EventReminderMail;
 use App\Models\Event;
@@ -50,10 +51,7 @@ class EventController extends Controller
         $event->start_datetime = Carbon::parse($event->start_datetime)->format('Y-m-d\TH:i:s');
         $event->end_datetime = Carbon::parse($event->end_datetime)->format('Y-m-d\TH:i:s');
 
-        //event(new EventStore($event));
-        //dispatch(new TelegramNotificationJob(Auth::user(), $event));
-
-        return response()->json(['event' => $event]);
+        return response()->json([$event, 201]);
     }
 
     public function update(Request $request, Event $event)
@@ -84,5 +82,10 @@ class EventController extends Controller
         $event->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function EventStart(Event $event){
+
+        dispatch(new EventStartJob($event));
     }
 }
